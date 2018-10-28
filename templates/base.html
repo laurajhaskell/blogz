@@ -1,26 +1,27 @@
 <!doctype html>
 <html>
+<div class='content'>    
     <head>
-        <link src="..css/styles.css" rel="stylesheet" type="text/css">
         <title>{{title}}</title>
+        <link type="text/css" rel="stylesheet" href="/style.css" />
     </head>
-<body>
+    <body>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/newpost">Add a Post</a>
+        </nav>
+        
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            <ul>
+            {% for category,message in messages %}
+                <li class="{{category}}">{{message}}</li>
+            {% endfor %}
+            </ul>
+        {% endwith %}
 
-    <div>
-        <p><a href="/blog">Home</a> || <a href="/newpost">Add a new post</a></p>
-    </div>
-    
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        <ul>
-        {% for category,message in messages %}
-            <li class="{{category}}">{{message}}</li>
-        {% endfor %}
-        </ul>
-    {% endwith %}
-    
+        {% block content %}
+        {% endblock %}
 
-    {% block content %}
-    {% endblock %}
-
-</body>
+    </body>
+</div>
 </html>
