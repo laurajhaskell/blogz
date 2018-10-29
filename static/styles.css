@@ -1,0 +1,53 @@
+.error {
+    color: red;
+}
+
+.content {
+    width: 100%;
+    max-content: 1000px;
+    background-color: rgb(229, 241, 245);
+    font-size: 95%;
+    font-family: Gotham-Light;
+
+}
+
+h1 {
+    font-family: Gotham-Light;
+    text-align: center;
+    color: white;
+}
+
+h2 {
+    font-family: GothamBold;
+    color: darkblue;
+}
+
+title {
+    font-family: GothamBold;
+    color: darkblue;
+}
+
+.blogpost {
+    background-color: whitesmoke;
+    padding: 0 30px 10px 30px;
+    margin: 10px;
+}
+
+a {
+    color: darkgreen;
+}
+
+@font-face {
+    font-family: Gotham-Light;
+    src: url('/static/fonts/Gotham-Light.otf');
+}
+
+@font-face {
+    font-family: GothamBold;
+    src: url('/static/fonts/GothamBold.ttf');
+}
+
+@font-face {
+    font-family: GothamMedium;
+    src: url('/static/fonts/GothamMedium.ttf');
+}
