@@ -38,7 +38,7 @@ def index():
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
-    '''New for build-a-blog. Displays newpost.html and delivers form data to index.html'''
+    
     if request.method == 'POST':
         title = request.form['blog-title']
         body = request.form['blog-body']
@@ -48,16 +48,16 @@ def newpost():
             flash("Please enter a title", 'error')
             return render_template('newpost.html', body=body)
         elif body == "":
-            flash("Please write a blog post.", 'error')
+            flash("Please write a blog post", 'error')
             return render_template('newpost.html', title=title)
 
         
         new_blog = Blog(title, body)
-        db.add(new_blog)
+        db.session.add(new_blog)
         db.session.flush()
         db.session.commit()
 
-        #set id for each new blog
+        #set unique id for each new blog
         num = new_blog.id
         return redirect('/blog?id={0}'.format(num))
 
@@ -67,6 +67,7 @@ def newpost():
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
 
+    #handle additional GET request
     num = request.args.get('id')
     blog = Blog.query.filter_by(id=num).first()
     return render_template('blog.html', blog=blog)
