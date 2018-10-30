@@ -53,7 +53,7 @@ def newpost():
 
         
         new_blog = Blog(title, body)
-        db.session.add(new_blog)
+        db.add(new_blog)
         db.session.flush()
         db.session.commit()
 
