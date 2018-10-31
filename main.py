@@ -81,6 +81,9 @@ def login():
         else:
             flash("Incorrect password")
             return render_template('login.html')
+    
+    return render_template('login.html') 
+
 
 
 @app.route('/signup', methods=['POST', 'GET'])
