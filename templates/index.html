@@ -2,10 +2,17 @@
 
 {% block content %}
 
-<h1>Build A Blog</h1>
-</div>
+<h1>All Users</h1>
 
-<div class='content'>
+    {% for user in users %}
+
+    <p><a href="/blog?user={{user.id}}">{{user.username}}</a></p>
+
+    {% endfor %}
+
+{% endblock %}
+
+<!-- <div class='content'>
 {% if blogs|length == 0 %}
 <p>No blogs yet. <a href='/newpost'>Add a post</a></p>
 {% else %}
@@ -30,4 +37,4 @@
     </table>
 {% endif %}
 </div>
-{% endblock %}
+{% endblock %} -->
