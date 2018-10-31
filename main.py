@@ -50,6 +50,83 @@ def index():
     return render_template('index.html', blogs=blogs)
 
 
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    username = ''
+    password = ''
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        existing_user = User.query.filter_by(username=username).first()
+
+        # user enters username not in database and must signup
+        if not existing_user:
+            flash("User does not exist. Sign up.")
+            return redirect('/signup')
+
+        # user enters correct password and directed to create new post
+        if existing_user and existing_user.password == password:
+            session['username'] = username
+            return redirect('/newpost')
+        # user enters username in database and password not in database 
+        else:
+            flash("Incorrect password")
+            return render_template('login.html')
+
+
+@app.route('/signup', methods=['POST', 'GET'])
+def signup():
+    username = ''
+    password = ''
+    verify = ''
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify = request.form['verify']
+
+        # error for blank username or less than 3 char
+        if not username:
+            flash("Please enter username")
+            return render_template('signup.html')
+        elif len(username) < 3:
+            flash("Invalid username. Must be 3 characters or more.")
+            return render_template('/signup.html')
+
+        # error for blank password or less than 3 char
+        if not password:
+            flash("Please enter password")
+            return render_template('signup.html')
+        elif len(password) < 3:
+            flash("Invalid password. Must be 3 characters or more.")
+            return render_template('/signup.html')
+        
+        # error for blank verify or not matching
+        if not verify:
+            flash("Please verify password")
+            return render_template('/signup.html')
+        elif verify != password:
+            flash("Passwords do not match.")
+            return render_template('/signup.html')
+
+        existing_user = User.query.filter_by(username=username).first()
+
+        # all correct fields, stores info in database
+        if not existing_user:
+            new_user = User(username, password)
+            db.session.add(new_user)
+            db.session.commit()
+            session['username'] = username
+            return redirect('/newpost')
+        # error for existing username
+        else:
+            flash("Username already exists. Choose a new username.")
+            return redirect('/newpost')
+    
+    return render_template('signup.html')
+
+
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
     
