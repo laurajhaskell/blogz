@@ -50,12 +50,14 @@ def require_login():
 @app.route('/')
 def index():
 
-    blogs = Blog.query.all()
+    users = User.query.all()
+    return render_template('index.html', users=users)
+    # blogs = Blog.query.all()
 
-    if request.args:
-        return redirect('/blog')
+    # if request.args:
+    #     return redirect('/blog')
 
-    return render_template('index.html', blogs=blogs)
+    # return render_template('index.html', blogs=blogs)
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -99,26 +101,26 @@ def signup():
 
         # error for blank username or less than 3 char
         if not username:
-            flash("Please enter username")
+            flash("Please enter username", 'error')
             return render_template('signup.html')
         elif len(username) < 3:
-            flash("Invalid username. Must be 3 characters or more.")
+            flash("Invalid username. Must be 3 characters or more.", 'error')
             return render_template('/signup.html')
 
         # error for blank password or less than 3 char
-        if not password:
-            flash("Please enter password")
+        elif not password:
+            flash("Please enter password", 'error')
             return render_template('signup.html')
         elif len(password) < 3:
-            flash("Invalid password. Must be 3 characters or more.")
+            flash("Invalid password. Must be 3 characters or more.", 'error')
             return render_template('/signup.html')
         
         # error for blank verify or not matching
-        if not verify:
-            flash("Please verify password")
+        elif not verify:
+            flash("Please verify password", 'error')
             return render_template('/signup.html')
         elif verify != password:
-            flash("Passwords do not match.")
+            flash("Passwords do not match.", 'error')
             return render_template('/signup.html')
 
         existing_user = User.query.filter_by(username=username).first()
@@ -132,7 +134,7 @@ def signup():
             return redirect('/newpost')
         # error for existing username
         else:
-            flash("Username already exists. Choose a new username.")
+            flash("Username already exists. Choose a new username." 'error')
             return redirect('/newpost')
     
     return render_template('signup.html')
@@ -146,39 +148,68 @@ def logout():
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
+
+    title = ''
+    body = ''
+    owner = User.query.filter_by(username=session['username']).first()
+
+    if request.method == 'GET':
+        return render_template('newpost.html', heading="New Blog")
     
     if request.method == 'POST':
-        title = request.form['blog-title']
-        body = request.form['blog-body']
+        title = request.form['title']
+        body = request.form['body']
 
         #validate blog title and body
-        if title == "":
+        if title == '' and body == '':
+            flash("Please enter a title and body.", 'error')
+        elif title == "":
             flash("Please enter a title", 'error')
             return render_template('newpost.html', body=body)
         elif body == "":
             flash("Please write a blog post", 'error')
             return render_template('newpost.html', title=title)
 
-        
-        new_blog = Blog(title, body)
-        db.session.add(new_blog)
-        db.session.flush()
-        db.session.commit()
+        else:
+            new_blog = Blog(title, body, owner)
+            db.session.add(new_blog)
+            db.session.commit()
 
-        #set unique id for each new blog
-        num = new_blog.id
-        return redirect('/blog?id={0}'.format(num))
+            #set unique id for each new blog
+            num = new_blog.id
+            return redirect('/blog?id={0}'.format(num))
 
-    return render_template('newpost.html')
+    return render_template('newpost.html', title=title)
 
 
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
 
-    #handle additional GET request
-    num = request.args.get('id')
-    blog = Blog.query.filter_by(id=num).first()
-    return render_template('blog.html', blog=blog)
+    blogs = Blog.query.all()
+    users = User.query.all()
+    title = 'title'
+    body = 'body'
+
+    if 'id' in request.args:
+        blog_id = request.args.get('id')
+
+        for blog in blogs:
+            if int(blog_id) == blog.id:
+                title = blog.title
+                body = blog.body
+                owner_id = blog.owner_id
+                owner = User.query.filter_by(id=owner_id).first()
+                username = owner.username
+                return render_template('singlepost.html', title=title, body=body, username=username, owner_id=owner_id)
+
+    elif 'user' in request.args:
+        user_id = request.args.get('user')
+        user = User.query.filter_by(id=user_id).first()
+        blogs = user.blogs
+        return render_template('singleuser.html', user=user, blogs=blogs, )
+
+    else: 
+        return render_template('blog.html',blogs=blogs)
 
 
 if __name__ == '__main__':
