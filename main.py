@@ -52,12 +52,7 @@ def index():
 
     users = User.query.all()
     return render_template('index.html', users=users)
-    # blogs = Blog.query.all()
-
-    # if request.args:
-    #     return redirect('/blog')
-
-    # return render_template('index.html', blogs=blogs)
+    
 
 
 @app.route('/login', methods=['POST', 'GET'])
